@@ -109,7 +109,8 @@ if __name__ == '__main__':
     inputs = os.listdir(folder)
 
 
-    NBC = NBClassifier([folder+inputs[0]])
+    NBC = NBClassifier([folder+input for input in inputs])
     NBC.train()
 
     NBC.organiza_teste([folder+inputs[1]])
+    print(len(NBC.V))

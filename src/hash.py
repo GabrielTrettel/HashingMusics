@@ -7,9 +7,12 @@ class Hash:
 
 
     def __hash__(self, attrib):
-        #TODO
-        return attrib
 
+
+
+
+
+        return hash_value
 
     def __iter__(self, key=True, value=True):
         for item in self.__table:
@@ -150,3 +153,6 @@ class SetHash(Hash):
                 return True
 
         return False
+
+
+if __name__ == '__main__':
