@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from container import DictionaryHash, SetHash
 import sys
 import os
 import re
@@ -11,12 +12,18 @@ regex = r"[-'a-zA-ZÀ-ÖØ-öø-ÿ]+"
 class NBClassifier:
     def __init__(self, training_file=None):
         self.n_musics      = 0
-        self.sentiments    = dict()  # Quantidade de ocorrencias para cada classe {c1:20, c4:30}
-        self.V             = set()   # Um conjunto com todas as palavras (vocabulario) {p1, p2, p3}
-        self.bigdoc        = dict()  # {classe1: [palavra1, palavra2,...], classe2:[p3, p1,...]}
+        self.sentiments    = DictionaryHash()  # Quantidade de ocorrencias para cada classe {c1:20, c4:30}
+        self.V             = SetHash()         # Um conjunto com todas as palavras (vocabulario) {p1, p2, p3}
+        self.bigdoc        = DictionaryHash()  # {classe1: [palavra1, palavra2,...], classe2:[p3, p1,...]}
 
-        self.logprior      = dict()  # prob a priori para cada classe {p1:0.4, p2:0.6}
-        self.loglikelihood = dict()  # log da afinidade de cada palavra para cada classe
+        self.logprior      = DictionaryHash()  # prob a priori para cada classe {p1:0.4, p2:0.6}
+        self.loglikelihood = DictionaryHash()  # log da afinidade de cada palavra para cada classe
+
+        # self.sentiments    = dict()
+        # self.V             = set()
+        # self.bigdoc        = dict()
+        # self.logprior      = dict()
+        # self.loglikelihood = dict()
 
         if training_file is not None:
             self.load_data(training_file)
@@ -47,11 +54,12 @@ class NBClassifier:
 
 
     def train(self):
-        for sentiment in self.sentiments:
+        for sentiment in self.sentiments.keys():
             Ndoc = self.n_musics
             Nc   = self.sentiments[sentiment]
 
             #self.logprior[sentiment] = math.log(Nc/Ndoc)
+            print(sentiment)
             self.logprior[sentiment]  = Nc/Ndoc
 
             count_wc = 0
@@ -113,4 +121,4 @@ if __name__ == '__main__':
     NBC.train()
 
     NBC.organiza_teste([folder+inputs[1]])
-    print(len(NBC.V))
+    print(NBC.bigdoc)
