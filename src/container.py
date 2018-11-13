@@ -3,7 +3,7 @@ from hash import multHash
 
 class Hash:
     def __init__(self):
-        self._table = [[] for x in range(3000)]
+        self._table = [[] for x in range(1024)]
         self._length = 0
 
 
@@ -12,9 +12,8 @@ class Hash:
 
     def __iter__(self, key=True, value=True):
         for item in self._table:
-            if len(item) > 0:
-                for element in item:
-                    yield element
+            for element in item:
+                yield element
 
 
     def __len__(self):
@@ -33,7 +32,6 @@ class Hash:
         for item in self._table[index]:
             if equals(item, key):
                 return True
-
         return False
 
 
@@ -49,7 +47,9 @@ class Hash:
         for i,item in enumerate(self._table[index]):
             if equals(item, key):
                 del self._table[index][i]
+                self._length -= 1
                 return item
+        return None
 
 
 
@@ -66,7 +66,6 @@ class DictionaryHash(Hash):
                 item[1] = value
                 is_in_table = True
                 break
-
         if not is_in_table:
             self._table[index].append([key,value])
             self._length += 1
@@ -77,7 +76,6 @@ class DictionaryHash(Hash):
         for item in self._table[index]:
             if item[0] == key:
                 return item[1]
-
         return None
 
 
@@ -87,6 +85,7 @@ class DictionaryHash(Hash):
         for i,item in enumerate(self._table[index]):
             if item[0] == key:
                 del self._table[index][i]
+                self._length -= 1
                 return True
         return False
 
@@ -96,7 +95,6 @@ class DictionaryHash(Hash):
         for item in self._table:
             if len(item) > 0:
                 string += ", ".join(f'{it[0]}:{it[1]}' for it in item) + ',\n'
-
         return string.strip(', ') + '}'
 
 
@@ -124,7 +122,6 @@ class SetHash(Hash):
         for item in self._table:
             if len(item) > 0:
                 string += ", ".join(str(elemment) for elemment in item) + ", "
-
         return string.strip(', ') + "}"
 
 
@@ -135,7 +132,6 @@ class SetHash(Hash):
             if item == key:
                 is_in_table = True
                 break
-
         if not is_in_table:
             self._table[index].append(key)
             self._length += 1
@@ -146,9 +142,6 @@ class SetHash(Hash):
         for i,item in enumerate(self._table[index]):
             if item == key:
                 del self._table[index][i]
+                self._length -= 1
                 return True
-
         return False
-
-
-# if __name__ == '__main__':

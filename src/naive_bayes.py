@@ -5,6 +5,7 @@ import os
 import re
 import math
 import sklearn.metrics as sk
+import pickle
 
 regex = r"[-'a-zA-ZÀ-ÖØ-öø-ÿ]+"
 
@@ -121,4 +122,6 @@ if __name__ == '__main__':
     NBC.train()
 
     NBC.organiza_teste([folder+inputs[1]])
-    print(NBC.bigdoc)
+    
+
+    print(list(NBC.V))

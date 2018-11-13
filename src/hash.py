@@ -10,19 +10,22 @@ def multHash(value=""):
 
     x = bin(sum([ord(char) for char in value]))[2:]
     x *= 2
-    x = x[:max(0,len(x)-truncate)]
-    x = x[max(0, len(x)-K):]
+    x = x[ :max(0,len(x)-truncate)]
+    x = x[max(0, len(x)-K): ]
 
     return int(x, 2)
 
+def defaultHash(value=""):
+    return hash(value) % 1025
 
-def benchmark():
+
+def benchmark(funcao):
         # 1239 palavras
         words = pickle.load(open('words.pkl', 'rb'))
-
+        print(len(words))
         frequency = dict()
         for word in words:
-            i = hash_multiplicacao(word)
+            i = funcao(word)
             if i not in frequency:
                 frequency[i] = 1
             else:
@@ -30,11 +33,16 @@ def benchmark():
 
         sorted_x = sorted(frequency.items(), key=operator.itemgetter(1))
 
-        print("min key: ", min(list(frequency.keys())))
+        print(f"min key: {min(list(frequency.keys()))}\nmax value: {max(list(frequency.values()))} ")
 
-        print('x,y')
-        for item in sorted_x:
-            print(f"{item[0]},{item[1]}")
+        with open("saida"+f"{str(funcao)[:18]}.txt", 'w') as f:
+            header = 'x,y\n'
+            for item in sorted_x:
+                header += f"{item[0]},{item[1]}\n"
+            header += '\n\n\n'
+            f.writelines(header)
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    # benchmark(defaultHash)
+    benchmark(multHash)
