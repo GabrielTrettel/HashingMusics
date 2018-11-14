@@ -2,27 +2,19 @@
 
 import operator
 import pickle
-# h(x) = (x*x div 2(b – k)/2) mod 2k
-def multHash(value=""):
-    K = 10
-    B = 17
-    truncate = int(((B - K) / 2))
+from tqdm import tqdm
 
-    x = bin(sum([ord(char) for char in value]))[2:]
-    x *= 2
-    x = x[ :max(0,len(x)-truncate)]
-    x = x[max(0, len(x)-K): ]
+B = 11
+K = 2753
+def multHash(value):
+    return sum([ord(char)**(qtd+B) for qtd,char in enumerate(value)]) % K
 
-    return int(x, 2)
 
 def defaultHash(value=""):
-    return hash(value) % 1025
+    return hash(value) % 2753
 
-
-def benchmark(funcao):
+def benchmark(words, funcao):
         # 1239 palavras
-        words = pickle.load(open('words.pkl', 'rb'))
-        print(len(words))
         frequency = dict()
         for word in words:
             i = funcao(word)
@@ -31,9 +23,13 @@ def benchmark(funcao):
             else:
                 frequency[i] += 1
 
+        # return max(list(frequency.values()))
         sorted_x = sorted(frequency.items(), key=operator.itemgetter(1))
 
-        print(f"min key: {min(list(frequency.keys()))}\nmax value: {max(list(frequency.values()))} ")
+        print(f"min key: {min(list(frequency.keys()))}\nmax value: {max(list(frequency.values()))}")
+        print(f"# keys: {len(frequency.keys())}")
+        print(f'B = {B}\nK = {K}')
+
 
         with open("saida"+f"{str(funcao)[:18]}.txt", 'w') as f:
             header = 'x,y\n'
@@ -44,5 +40,6 @@ def benchmark(funcao):
 
 
 if __name__ == '__main__':
-    # benchmark(defaultHash)
-    benchmark(multHash)
+    # benchmark(multHash, 5, 1) 54001
+    words = pickle.load(open('words.pkl', 'rb'))
+    benchmark(words, multHash)

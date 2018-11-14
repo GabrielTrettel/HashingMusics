@@ -3,7 +3,7 @@ from hash import multHash
 
 class Hash:
     def __init__(self):
-        self._table = [[] for x in range(1024)]
+        self._table = [[] for x in range(2753)]
         self._length = 0
 
 
@@ -114,8 +114,12 @@ class DictionaryHash(Hash):
 
 
 class SetHash(Hash):
-    def __init__(self):
+    def __init__(self, arg=None):
         super(SetHash, self).__init__ ()
+
+        if arg != None:
+            try:     self.__foreign_input(arg)
+            except:  raise ValueError("Can't parse argument")
 
     def __str__(self):
         string = "{"
@@ -145,3 +149,8 @@ class SetHash(Hash):
                 self._length -= 1
                 return True
         return False
+
+
+    def __foreign_input(self, arg):
+        for item in arg:
+            self.add(item)
