@@ -3,21 +3,23 @@ from hash import multHash
 
 class Hash:
     def __init__(self):
-        self._table = [[] for x in range(2753)]
-        self._length = 0
-
+       self._table = [[] for _ in range(2753)]
+       self._length = 0
+        
 
     def __hash__(self, attrib):
         return multHash(str(attrib))
 
-    def __iter__(self, key=True, value=True):
+    def __iter__(self):
         for item in self._table:
             for element in item:
                 yield element
 
 
+
     def __len__(self):
         return self._length
+
 
 
     def __contains__(self, key):

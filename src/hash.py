@@ -7,7 +7,7 @@ from tqdm import tqdm
 B = 11
 K = 2753
 def multHash(value):
-    return sum([ord(char)**(qtd+B) for qtd,char in enumerate(value)]) % K
+    return sum([ord(char)**(qtd+B) for qtd,char in enumerate(str(value))]) % K
 
 
 def defaultHash(value=""):
@@ -29,6 +29,7 @@ def benchmark(words, funcao):
         print(f"min key: {min(list(frequency.keys()))}\nmax value: {max(list(frequency.values()))}")
         print(f"# keys: {len(frequency.keys())}")
         print(f'B = {B}\nK = {K}')
+        print(f"qtd of words: {len(words)}")
 
 
         with open("saida"+f"{str(funcao)[:18]}.txt", 'w') as f:
@@ -43,3 +44,4 @@ if __name__ == '__main__':
     # benchmark(multHash, 5, 1) 54001
     words = pickle.load(open('words.pkl', 'rb'))
     benchmark(words, multHash)
+    # print(multHash([1, 2, 3, 4]))

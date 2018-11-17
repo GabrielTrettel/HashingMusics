@@ -9,13 +9,19 @@ class Builder:
 
     def __init__(self):
         self.model_lyrics_path = sys.path[0][:-3] + "data_base/"
-        self.new_lyrics_path   = ""
+        self.new_lyrics_path   = "/home/trettel/Documents/projects/HashingMusics/to_predict_db/"
 
-        self.DB_SEARCH         = DictionaryHash
+        self.DB_SEARCH         = self.__openDB()
         
         self.DB_SEARCH_FILE    = sys.path[0][:-3] + "search_DB.pkl"
         self.musics_folder     = "~/Musics"
        
+
+    def __openDB(self):
+        try:
+            return pickle.load(open(self.DB_SEARCH_FILE, 'rb'))
+        except:
+            return DictionaryHash()
 
     def buildWizard(self):
 
@@ -28,10 +34,11 @@ class Builder:
                                    `-'
                          """
         print(welcome_header)
-        print(self.model_lyrics_path)
-        print("\nBem vindo ao assistente de configuração do seu ambiente.")
+        print("\nBem vindo ao assistente de configuração do seu ambiente.\n")
         
-        self.new_lyrics_path = input("Onde você gostaria de configurar seu diretório de novas letras a serem classificadas?\n")
+        new_lyrics_path = input(f"Onde você gostaria de configurar seu diretório de novas letras a serem classificadas?\n(por padrão: {self.new_lyrics_path}) ")
+        if len(new_lyrics_path) > 0:
+            self.new_lyrics_path = new_lyrics_path
 
         musics_folder    = input(f"\nOnde voce gostaria de configurar a pasta onde os arquivos de audio estão? (por padrão: {self.musics_folder})\n") 
     
@@ -46,20 +53,31 @@ class Builder:
 
     def buildSentimentMusicMap(self):
         try:
-            self.DB_SEARCH = picke.load(open('../search_DB.pkl', 'rb'))
+            self.DB_SEARCH = pickle.load(open('../search_DB.pkl', 'rb'))
         except:
-            pass    
-        
+            pass 
+
+        print('\n\ṇ̣────────────────────────────────────────────────────────────────────────────────────────────────')
         train = [f"{self.model_lyrics_path}{file}" for file in os.listdir(self.model_lyrics_path)]
-        print(train)
         classifier = NBClassifier(train)
         classifier.train()
-
-
-
+        
+        files_to_predict = [f"{self.new_lyrics_path}{file}" for file in os.listdir(self.new_lyrics_path)] 
+        print()# print just a blank line 
+        for file in  files_to_predict:
+            with open(file, 'r') as f:
+                sentiment = classifier.predict(f.readlines())
+                print(sentiment, '\t-\t', file.split('/')[-1])
+                
+                form_file = file.split('/')[-1].strip(' ').lower()
+                if str(sentiment) not in self.DB_SEARCH:
+                    self.DB_SEARCH[sentiment] = SetHash()
+                    self.DB_SEARCH[sentiment].add(form_file)
+                else:                
+                    self.DB_SEARCH[sentiment].add(form_file)
+        print("\n")
+        #print(self.DB_SEARCH)
 
 if __name__ == '__main__':
-    print(sys.path)
     instancia = Builder()
-        
     instancia.buildWizard()
