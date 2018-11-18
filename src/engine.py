@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from container import DictionaryHash, SetHash
 from naive_bayes import NBClassifier
+import Levenshtein as LEV
 import sys
 import pickle
 import os
@@ -95,24 +96,55 @@ class Builder:
             os.system(f'rm {self.DB_SEARCH_FILE}')
         except:
             print("Não foi possivel deleter o banco de dados. Provavelmente o\narquivo não existe ou está em outro lugar")
+    
 
+
+    def getClasses(self):
+        return "\n".join(self.DB_SEARCH.keys())
+
+
+
+    def getMusics(self):
+        return "\n".join(self.DB_SEARCH.values())
+
+
+
+    def __equal(self, m1, m2, ratio):
+        if m2 == None: return True
+        if ratio == 1:
+            return m1 == m2
+        else:
+            return LEV.ratio(m1, m2) >= ratio
 
     def searchDB(self, inputs):
-        sentiment = ""
-        print(inputs['-s'])
+        sentiments = ""
 
         if inputs['-s'] != None:
             if inputs['-s'] in self.DB_SEARCH:
-                sentiment = [inputs['-s']]
+                sentiments = [inputs['-s']]
             else:
                 print(f"Sentimento não encontrado na base de dados.\n Tente algum desses:\n{', '.join(self.DB_SEARCH.keys())}")
                 return False
         else:
-            sentiment = self.DB_SEARCH.keys()
+            sentiments = self.DB_SEARCH.keys()
         
-        print(", ".join(sentiment))
+        m_s = inputs['-m']
+        ratio = inputs['-l']
+        musics = []
+        for sentiment in sentiments:
+            musics.extend(m for m in self.DB_SEARCH[sentiment] if self.__equal(m, m_s, ratio))
+        
+        
+        songs = "\n".join(musics)
 
+        with open('/tmp/PLAYLIST.txt', 'w') as f:
+            f.writelines(songs)
+     
+        os.system('$EDITOR /tmp/PLAYLIST.txt')
+        with open ('/tmp/PLAYLIST.txt', 'r') as f:
+            musics = [m.strip('\n') for m in f.readlines()]
 
+        return musics
 
 if __name__ == '__main__':
     instancia = Builder()
