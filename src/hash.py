@@ -44,4 +44,3 @@ if __name__ == '__main__':
     # benchmark(multHash, 5, 1) 54001
     words = pickle.load(open('words.pkl', 'rb'))
     benchmark(words, multHash)
-    # print(multHash([1, 2, 3, 4]))

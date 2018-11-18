@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import sys
-from engine import search
+from engine import Builder
 welcome_header = """
     .  .         .               .   ,
     |  |         |   o           |\ /|         o
@@ -27,24 +27,24 @@ welcome_header = """
 
 
 if __name__ == '__main__':
-    print(sys.argv)
+    engine = Builder()
+
     args = sys.argv
-    
-    template = [('-s',str,""), ('-b',str,""), ('-l',float,1)]#, ('-t',str,False)]
+    template = [('-s',str,None), ('-m',str,None), ('-l',float,1)]#, ('-t',str,False)]
     template_help = {'-s': 'por um sentimento que existe na base de dados',
-                     '-b': 'por uma musica (entre aspas simples caso tiver espaços)',
+                     '-m': 'por uma musica (entre aspas simples caso tiver espaços)',
                      '-l': 'por um numero de zero a um representando a quão proximo deseja a busca'
                      }#'-t': 'pelos os limites inferiores e superiores, separados por vírgula, da playlist'}
 
     args_parse = dict()
     flag = False
     for item,type_converter,default in template:
-        args_parse[item[1]] = default
+        args_parse[item] = default
         for i,arg in enumerate(args[1:]):
             if arg == item:
                 try:
                     if len(args[i+2]) == 2 and args[i+2][0] == '-': raise ValueError
-                    args_parse[item[1]] = type_converter(args[i+2])
+                    args_parse[item] = type_converter(args[i+2])
                 except:
                     print(f"INPUT ERROR:\no indicador '{item}' precisa ser seguido {template_help[item]}")
                     flag = True
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         if flag: break
     
     if not flag:
-        search(args_parse)
+        engine.searchDB(args_parse)
 
     # print for debug purposes
     print('\n'.join([f'{k}  -  {v}' for k,v in args_parse.items()]))

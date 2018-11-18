@@ -59,7 +59,7 @@ class NBClassifier:
                             for sentiment in music_sentiments:
                                 self.bigdoc[sentiment].append(word)
 
-        print(f"Total de : sentimentos={len(self.sentiments)} \t musicas={self.n_musics} \t palavras={len(self.V)}\n")
+        print(f"Dados da base de dados de treino:\nsentimentos={len(self.sentiments)} \t musicas={self.n_musics} \t palavras={len(self.V)}\n")
 
 
     def train(self):
