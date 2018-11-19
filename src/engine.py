@@ -14,7 +14,7 @@ class Builder:
         self.model_lyrics_path = sys.path[0][:-3] + "data_base/"
         self.new_lyrics_path   = sys.path[0][:-3] + "to_predict_db/"
         self.DB_SEARCH_FILE    = sys.path[0][:-3] + "search_DB.pkl"
-        self.musics_folder     = "/home/trettel/Music"
+        self.musics_folder     = sys.path[0][:-3] + "Music/"
         
         self.table             = str.maketrans("","",",:!@#$%*(){\}[]?;") 
         self.DB_SEARCH         = DictionaryHash()
