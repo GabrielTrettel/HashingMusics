@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 from container import DictionaryHash, SetHash
 from naive_bayes import NBClassifier
+from os import walk
 import Levenshtein as LEV
 import sys
 import pickle
 import os
+
 
 class Builder:
 
@@ -12,24 +14,21 @@ class Builder:
         self.model_lyrics_path = sys.path[0][:-3] + "data_base/"
         self.new_lyrics_path   = sys.path[0][:-3] + "to_predict_db/"
         self.DB_SEARCH_FILE    = sys.path[0][:-3] + "search_DB.pkl"
-        self.musics_folder     = "~/Musics"
+        self.musics_folder     = "/home/trettel/Music"
         
+        self.table             = str.maketrans("","",",:!@#$%*(){\}[]?;") 
         self.DB_SEARCH         = DictionaryHash()
-        self.__openDB()
+        
         
 
         
-    def __openDB(self):
+    def openDB(self):
         try:
             self.DB_SEARCH = pickle.load(open(self.DB_SEARCH_FILE, 'rb'))
+            return True
         except:
-            print("Você não possui o banco de dados para pesquisa. Deseja iniciar o")
-            print("assistente de configuração agora? (s/n)  ", end="")
-            i = input()
-
-            if i.lower() == 's' or i.lower() == 'y':
-                self.buildWizard()
-
+            return False
+    
 
     def buildWizard(self):
         os.system('clear')
@@ -90,23 +89,55 @@ class Builder:
                     self.DB_SEARCH[sentiment].add(form_file)
         
         pickle.dump(self.DB_SEARCH, open(self.DB_SEARCH_FILE, 'wb'))
-        
+       
+
     def deleteDB(self):
         try:
             os.system(f'rm {self.DB_SEARCH_FILE}')
         except:
             print("Não foi possivel deleter o banco de dados. Provavelmente o\narquivo não existe ou está em outro lugar")
-    
 
 
-    def getClasses(self):
+    def getSentiments(self):
         return "\n".join(self.DB_SEARCH.keys())
 
 
-
     def getMusics(self):
-        return "\n".join(self.DB_SEARCH.values())
+        return "\n".join(['\n'.join(m) for m in self.DB_SEARCH.values()])
 
+
+    def printInfos(self):
+        print("No banco de dados temos os seguintes sentimentos: ", end="")
+        print(", ".join(self.DB_SEARCH.keys()))
+        print()
+
+        counter = 0
+        for sentiment in self.DB_SEARCH.keys():
+            qtd = len(self.DB_SEARCH[sentiment])
+            counter += qtd
+            print(f"- {qtd} {'musica'if qtd==1 else 'musicas'} {'classificada' if qtd==1 else 'classificadas'} como {sentiment}")
+
+        print(f"Num total de {counter} {'musica'if counter == 1 else 'musicas'}.")
+
+    
+    def playSongs(self, musics, player):
+        command = f"{player} "
+
+        for (dirpath, dirnames, filenames) in walk(self.musics_folder):
+            for filename in filenames:
+                file = filename.lower().translate(self.table).split('.')[0]
+                for music in musics:
+                    if LEV.ratio(file, music) >= 0.9:
+                        musics.remove(music)
+                        command += f'"{dirpath}"/"{filename}" '
+        
+        if len(musics) > 0:
+            print("Algumas musicas não puderam ser encontradas no seu diretório de áudios:")
+            print("───────────────────────────────────────────────────────────────────────")
+            print("\n".join(musics))
+            print("───────────────────────────────────────────────────────────────────────\n\n")
+        
+        os.system(command)
 
 
     def __equal(self, m1, m2, ratio):
@@ -115,6 +146,7 @@ class Builder:
             return m1 == m2
         else:
             return LEV.ratio(m1, m2) >= ratio
+
 
     def searchDB(self, inputs):
         sentiments = ""
@@ -137,14 +169,18 @@ class Builder:
         
         songs = "\n".join(musics)
 
-        with open('/tmp/PLAYLIST.txt', 'w') as f:
+        with open('PLAYLIST.txt', 'w') as f:
             f.writelines(songs)
      
-        os.system('$EDITOR /tmp/PLAYLIST.txt')
-        with open ('/tmp/PLAYLIST.txt', 'r') as f:
+        os.system('$EDITOR PLAYLIST.txt')
+        with open ('PLAYLIST.txt', 'r') as f:
             musics = [m.strip('\n') for m in f.readlines()]
-
-        return musics
+        
+        if inputs['-p'] != None:
+            self.playSongs(musics, inputs['-p'])
+        else:
+            return musics
+        
 
 if __name__ == '__main__':
     instancia = Builder()
