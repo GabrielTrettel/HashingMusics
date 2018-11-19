@@ -80,11 +80,12 @@ if __name__ == '__main__':
     status = engine.openDB()
     args = sys.argv
 
-    if not status and args[1] != '--make':
-        print("Você não possui o banco de dados para pesquisa. --make para construir")
         
-    elif len(args) == 1 or args[1] == '--help':
+    if len(args) == 1 or args[1] == '--help':
         print(help_msg)
+    
+    elif not status and args[1] != '--make':
+        print("Você não possui o banco de dados para pesquisa. --make para construir")
     
     elif args[1] == '--make':
         engine.buildWizard()
