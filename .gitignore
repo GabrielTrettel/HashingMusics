@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Running program stuff 
+PLAYLIST.txt
+search_DB.pkl
