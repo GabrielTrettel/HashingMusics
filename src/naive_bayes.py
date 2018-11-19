@@ -1,8 +1,16 @@
 #!/usr/bin/python3
 from container import DictionaryHash, SetHash
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
 import sys
+
+try:
+    from nltk.corpus import stopwords
+except:
+    print("Você precisa instalar uma biblioteca do python chamada nltk\nE rodar o seguinte comando num console:")
+    print(">>>> import nltk\n>>>>nltk.download('stopwords')\n")
+    sys.exit()
+
+
+from nltk.stem import PorterStemmer
 import os
 import re
 import math

@@ -2,10 +2,16 @@
 from container import DictionaryHash, SetHash
 from naive_bayes import NBClassifier
 from os import walk
-import Levenshtein as LEV
+from pathlib import Path
 import sys
 import pickle
 import os
+
+try:
+    import Levenshtein as LEV
+except:
+    print("Você precisa instalar uma biblioteca do python chamada levenshtein.")
+    sys.exit()
 
 
 class Builder:
@@ -14,7 +20,7 @@ class Builder:
         self.model_lyrics_path = sys.path[0][:-3] + "data_base/"
         self.new_lyrics_path   = sys.path[0][:-3] + "to_predict_db/"
         self.DB_SEARCH_FILE    = sys.path[0][:-3] + "search_DB.pkl"
-        self.musics_folder     = sys.path[0][:-3] + "Music/"
+        self.musics_folder     = str(Path.home()) + "/Music/"
         
         self.table             = str.maketrans("","",",:!@#$%*(){\}[]?;") 
         self.DB_SEARCH         = DictionaryHash()
@@ -49,7 +55,7 @@ class Builder:
         if len(new_lyrics_path) > 0:
             self.new_lyrics_path = new_lyrics_path
 
-        print("\nOnde voce gostaria de configurar a pasta onde os arquivos de audio estão?")
+        print("\nOnde voce gostaria de configurar a pasta onde os arquivos de áudio estão?")
         musics_folder = input(f"por padrão: {self.musics_folder})   ") 
     
         if len(musics_folder) > 0:
@@ -95,7 +101,7 @@ class Builder:
         try:
             os.system(f'rm {self.DB_SEARCH_FILE}')
         except:
-            print("Não foi possivel deleter o banco de dados. Provavelmente o\narquivo não existe ou está em outro lugar")
+            print("Não foi possível deletar o banco de dados. Provavelmente o\narquivo não existe ou está em outro lugar.")
 
 
     def getSentiments(self):
@@ -115,9 +121,9 @@ class Builder:
         for sentiment in self.DB_SEARCH.keys():
             qtd = len(self.DB_SEARCH[sentiment])
             counter += qtd
-            print(f"- {qtd} {'musica'if qtd==1 else 'musicas'} {'classificada' if qtd==1 else 'classificadas'} como {sentiment}")
+            print(f"- {qtd} {'música'if qtd==1 else 'músicas'} {'classificada' if qtd==1 else 'classificadas'} como {sentiment}")
 
-        print(f"Num total de {counter} {'musica'if counter == 1 else 'musicas'}.")
+        print(f"Num total de {counter} {'música'if counter == 1 else 'músicas'}.")
 
     
     def playSongs(self, musics, player):
@@ -132,7 +138,7 @@ class Builder:
                         command += f'"{dirpath}"/"{filename}" '
         
         if len(musics) > 0:
-            print("Algumas musicas não puderam ser encontradas no seu diretório de áudios:")
+            print("Algumas músicas não puderam ser encontradas no seu diretório de áudios:")
             print("───────────────────────────────────────────────────────────────────────")
             print("\n".join(musics))
             print("───────────────────────────────────────────────────────────────────────\n\n")
