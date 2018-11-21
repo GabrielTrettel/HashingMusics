@@ -14,23 +14,27 @@ def defaultHash(value=""):
     return hash(value) % 2753
 
 def benchmark(words, funcao):
-        # 1239 palavras
+        tot = 0
+        col = 0
+
         frequency = dict()
         for word in words:
             i = funcao(word)
+            
             if i not in frequency:
                 frequency[i] = 1
+                tot += 1
             else:
+                col += 1
                 frequency[i] += 1
 
-        # return max(list(frequency.values()))
         sorted_x = sorted(frequency.items(), key=operator.itemgetter(1))
 
         print(f"min key: {min(list(frequency.keys()))}\nmax value: {max(list(frequency.values()))}")
         print(f"# keys: {len(frequency.keys())}")
         print(f'B = {B}\nK = {K}')
         print(f"qtd of words: {len(words)}")
-
+        print(f"Média de colisões = {tot/col}")
 
         with open("saida"+f"{str(funcao)[:18]}.txt", 'w') as f:
             header = 'x,y\n'
@@ -41,6 +45,5 @@ def benchmark(words, funcao):
 
 
 if __name__ == '__main__':
-    # benchmark(multHash, 5, 1) 54001
     words = pickle.load(open('words.pkl', 'rb'))
     benchmark(words, multHash)

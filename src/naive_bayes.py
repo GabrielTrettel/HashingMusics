@@ -6,7 +6,7 @@ try:
     from nltk.corpus import stopwords
 except:
     print("Você precisa instalar uma biblioteca do python chamada nltk\nE rodar o seguinte comando num console:")
-    print(">>>> import nltk\n>>>>nltk.download('stopwords')\n")
+    print(">>> import nltk\n>>> nltk.download('stopwords')\n")
     sys.exit()
 
 
@@ -75,9 +75,8 @@ class NBClassifier:
             Ndoc = self.n_musics
             Nc   = self.sentiments[sentiment]
 
-            #self.logprior[sentiment] = math.log(Nc/Ndoc)
             print("Definindo o que", sentiment, "significa")
-            self.logprior[sentiment]  = Nc/Ndoc
+            self.logprior[sentiment]  = math.log(Nc/Ndoc)
 
             count_wc = 0
             for word in self.V:
@@ -87,7 +86,6 @@ class NBClassifier:
                 self.loglikelihood[(word,sentiment)] = math.log((self.bigdoc[sentiment].count(word) + 1)
                                                                 / (1 + count_wc + len(self.V)))
 
-                #self.loglikelihood[(w,sentiment)]  = (self.bigdoc[c].count(w) + 1) / (count_wc + len(self.V) )
 
     # Recebe com argumento um objeto arquivo.readlines() só com a letra da musica
     def predict(self, lyric):
@@ -100,31 +98,11 @@ class NBClassifier:
                     word = word.lower().translate(self.table)
                     word = self.ps.stem(word)
 
-                    if word not in self.stop_words and word in self.V:
+                    if word in self.V and word not in self.stop_words:
                         s[sentiment] += self.loglikelihood[(word,sentiment)]
-                        #s[c]  *= self.loglikelihood[(w,c)]
 
         return max(s, key=s.get)
 
-
-#     def predict_list(self, files):
-#         sentiment_to_music = DictionaryHash()
-# 
-#         for file in files:
-#             with open(file,'r') as training_document:
-#                 lines = [line.strip('\n') for line in training_document.readlines()]
-#                 
-#                 music_name = lines[0].strip('\n').lower()
-#                 lyric = lines[1:]
-#                 y_pred = self.predict(lyric)
-# 
-#                 if y_pred in sentiment_to_music:
-#                     sentiment_to_music[y_pred].add(music_name)
-#                 else:
-#                     sentiment_to_music[y_pred] = SetHash(music_name)
-#                     sentiment_to_music[y_pred].add()
-# 
-#         return sentiment_to_music
 
 
     def organiza_teste(self, files):
@@ -135,16 +113,12 @@ class NBClassifier:
             with open(file,'r') as training_document:
 
                 lines = [line.strip('\n') for line in training_document.readlines()]
-                music_sentiments = lines[1].split(',')
+                music_sentiments = lines[0].split(',')
                 lyric = lines[1:]
 
                 y_true.append(music_sentiments[0])
                 y_pred.append(self.predict(lyric))
                 
-
-        # por enquanto o f1_score não vai funcionar
-        # print("f1_score: ", sk.f1_score(y_true=y_true, y_pred=y_pred))
-        # acertividade do modelo
 
         iguais = [x for x in range(len(y_pred)) if (y_pred[x] == y_true[x])]
         print("%2.2f%% de acerto" % float((len(iguais)*100)/len(y_pred)))
@@ -153,10 +127,10 @@ class NBClassifier:
 if __name__ == '__main__':
     folder = sys.argv[1]
     inputs = os.listdir(folder)
+    files = [folder+input for input in inputs]
 
 
-    NBC = NBClassifier([folder+input for input in inputs])
+    NBC = NBClassifier(files[14:])
     NBC.train()
-
-    NBC.organiza_teste([folder+inputs[1]])
-    # print(len(NBC.V))
+     
+    NBC.organiza_teste(files[:14])
